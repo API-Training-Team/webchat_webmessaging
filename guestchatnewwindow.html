@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<p>GuestChat/WebChat test page with New Window</p>
+
+	<ul>
+		<li> <a href="index.html">Genesys Test Site Home Page</a> </li>
+	</ul>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Simple GuestChat/WebChat Example with New Window</title>
+</head>
+<body>
+
+    <h1>Simple GuestChat/WebChat Example with New Window</h1>
+    <form>
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" size="20" value="Joe" />
+
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" size="20" value="Customer" />
+		
+	<br>
+        <label for="agentAddress">Address</label>
+        <input type="text" id="agentAddress" size="20" value="7601 Interactive Way" />
+		
+        <label for="agentCity">City</label>
+        <input type="text" id="agentCity" size="10" value="Indianapolis" />
+		
+        <label for="agentState">State</label>
+        <input type="text" id="agentState" size="5" value="IN" />
+		
+        <label for="agentZIP">ZIP</label>
+        <input type="text" id="agentZIP" size="5" value="46278" />
+	
+	</br>
+	<br>
+	
+        <label for="agentPhone">Phone</label>
+		<input type="text" id="agentPhone" size="20" value="5558675309" />
+		
+		<label for="agentLocale">Locale</label>
+        <input type="text" id="agentLocale" size="5" value="en" />
+		
+		<label for="agentWelcomeMessage">Welcome Message</label>
+        <input type="text" id="agentWelcomeMessage" size="40" value="Thanks for chatting using the dev tools chat page." />
+		
+	</br>		
+	<br>
+	
+		<label for="agentCustomField1Label">customField1Label</label>
+        <input type="text" id="agentCustomField1Label" size="40" value="Label1" />
+		
+		<label for="agentCustomField1">customField1</label>
+        <input type="text" id="agentCustomField1" size="40" value="Field1" />
+
+	</br>
+	<br>
+	
+		<label for="agentCustomField2Label">customField2Label</label>
+        <input type="text" id="agentCustomField2Label" size="40" value="Label2" />
+		
+		<label for="agentCustomField2">customField2</label>
+        <input type="text" id="agentCustomField2" size="40" value="Field2" />
+	
+	</br>
+	<br>
+	
+		<label for="agentCustomField3Label">customField3Label</label>
+        <input type="text" id="agentCustomField3Label" size="40" value="Label3" />
+		
+		<label for="agentCustomField3">customField3</label>
+        <input type="text" id="agentCustomField3" size="40" value="Field3" />
+	
+	</br>
+	<br>	
+	
+		<label for="agentEmail">Email</label>
+        <input type="text" id="agentEmail" size="40" value="eps@genesys.com" />
+		
+		<label for="agentAttributeName">attributeName</label>
+        <input type="text" id="agentAttributeName" size="40" value="attributeName" />
+		
+		<label for="agentAttributeValue">attributeValue</label>
+        <input type="text" id="agentAttributeValue" size="40" value="attributeValue" />
+	
+	</br>
+	<br>
+        <button type="button" id="start-chat" onclick="genesysWebchat.startEmbeddedChat()">Open Chat in New Window</button>
+	</br>
+    </form>
+    <div id="chatContainer" style="height:600px"></div>
+
+    <!-- Replace mypurecloud.com with the hostname for your PureCloud region -->
+    <script src="https://apps.mypurecloud.com/webchat/jsapi-v1.js" type="text/javascript"></script>
+	
+	<script
+  id="purecloud-webchat-js"
+  type="text/javascript"
+  src="https://apps.usw2.pure.cloud/webchat/jsapi-v1.js"
+  region="us-west-2"
+  org-guid="9e0586e0-678f-455c-aede-039a8804c0d4"
+  deployment-key="03eb342c-16fd-426c-987a-b42ce0a2278e"
+	></script>
+<!-- deployment-key above is for general chat deployment-key NOT the deployment-key for co-browse -->
+	  
+    <script type="text/javascript">
+    let genesysWebchat = (function() {
+        function createChatConfig(){
+            let firstName = document.getElementById('firstName').value;
+            let lastName = document.getElementById('lastName').value;
+            let agentAddress = document.getElementById('agentAddress').value;
+			let agentCity = document.getElementById('agentCity').value;
+			let agentState = document.getElementById('agentState').value;
+            let agentZIP = document.getElementById('agentZIP').value;
+            let agentPhone = document.getElementById('agentPhone').value;
+            let agentLocale = document.getElementById('agentLocale').value;
+            let agentWelcomeMessage = document.getElementById('agentWelcomeMessage').value;
+			let agentCustomField1Label = document.getElementById('agentCustomField1Label').value;
+			let agentCustomField1 = document.getElementById('agentCustomField1').value;
+			let agentCustomField2Label = document.getElementById('agentCustomField2Label').value;
+			let agentCustomField2 = document.getElementById('agentCustomField2').value;
+			let agentCustomField3Label = document.getElementById('agentCustomField3Label').value;
+			let agentCustomField3 = document.getElementById('agentCustomField3').value;
+			let agentEmail = document.getElementById('agentEmail').value;
+			let agentAttributeName = document.getElementById('agentAttributeName').value;
+			let agentAttributeValue = document.getElementById('agentAttributeValue').value;
+
+            // For additional web chat config options, see web chat documentation. This example excludes some of the optional values.
+            return {
+                // Web chat application URL
+                "webchatAppUrl": "https://apps.usw2.pure.cloud/webchat",
+
+                // Web chat service URL
+                "webchatServiceUrl": "https://realtime.usw2.pure.cloud:443",
+
+                // Numeric organization ID
+                "orgId": 3894,
+
+                // Organization name
+                "orgName": "kwelschdev",
+
+                // Target agent email (OPTIONAL)
+                //"agentEmail": agentEmail,
+
+                // Queue Name
+                queueName : 'API Support',
+
+                // Log level
+                "logLevel": "DEBUG",
+
+                // Locale code
+                "locale": "en",
+                // Logo used at the top of the chat window
+                "companyLogo": {
+                    "width": 600,
+                    "height": 149,
+                    "url": "https://d3a63qt71m2kua.cloudfront.net/developer-tools/1275/assets/images/PC-blue-nomark.png"
+                },
+
+                // Logo used within the chat window
+                "companyLogoSmall": {
+                    "width": 149,
+                    "height": 149,
+                    "url": "https://d3a63qt71m2kua.cloudfront.net/developer-tools/1275/assets/images/companylogo.png"
+                },
+
+                // Image used for agent
+                "agentAvatar": {
+                    "width": 462,
+                    "height": 462,
+                    "url": "https://d3a63qt71m2kua.cloudfront.net/developer-tools/1275/assets/images/agent.jpg"
+                },
+
+                // Text displayed when the chat window opens
+                "welcomeMessage": "Thanks for chatting.",
+
+                // CSS class applied to the chat window
+                "cssClass": "webchat-frame",
+
+                // Custom style applied to the chat window
+                "css": {
+                    "width": "100%",
+                    "height": "100%"
+                },
+
+                // Deployment key for your cobrowse deployment from PureCloud admin UI
+                "cobrowseConfig": {
+                    "deploymentKey": "9pmBN69dWXOxA5rjIv19WNid3lJStO2j",
+                }
+				//deployment-key above is for co-browse deployment-key NOT the deployment-key for general chat
+            };
+        }
+        return {
+            startEmbeddedChat: function() {
+                let chatConfig = createChatConfig();
+                ININ.webchat.create(chatConfig, function(err, webchat) {
+                    if (err) {
+                        console.error('Unable to share page', (err.stack || err));
+                        return;
+                    }
+
+					webchat.renderPopup({
+						width: 400,
+						height: 400,
+						title: 'Chat'
+					});
+
+                });
+            }
+        }
+    })();
+    </script>
+
+<script>
+  (function(a,t,c,l,o,u,d){a['_genesysJourneySdk']=o;a[o]=a[o]||function(){
+  (a[o].q=a[o].q||[]).push(arguments)},a[o].l=1*new Date();u=t.createElement(c),
+  d=t.getElementsByTagName(c)[0];u.async=1;u.src=l;u.charset='utf-8';d.parentNode.insertBefore(u,d)
+  })(window, document, 'script', 'https://apps.mypurecloud.com/journey/sdk/js/web/v1/ac.js', 'ac');
+  ac('init', 'cd1a6845-a95b-4f07-8a80-b88434259aa9', { region: 'use1' });
+  ac('pageview');
+</script>
+
+</body>
+</html>

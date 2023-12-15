@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<p>Genesys Cloud WebChat test page</p>
+
+	<ul>
+		<li> <a href="index.html">Genesys Test Site Home Page</a> </li>
+	</ul>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Genesys Cloud WebChat Example</title>
+</head>
+<body>
+
+    <h1>Genesys Cloud WebChat Example</h1>
+ 
+<script type="text/javascript">
+
+
+  window._genesys = {
+	widgets: {
+		webchat: {
+			transport: {
+				type: "purecloud-v2-sockets",
+				dataURL: "https://api.usw2.pure.cloud",
+				deploymentKey: "666b893f-4268-4a99-a619-7c99ccb9d545",
+				orgGuid: "9e0586e0-678f-455c-aede-039a8804c0d4",
+				interactionData: {
+					routing: {
+						targetType: "QUEUE",
+						targetAddress: "API Support",
+						priority: 2
+					}
+				}
+			},
+			userData: {
+			addressStreet: "7601 Interactive Way",
+			addressCity: "Indianapolis",
+			addressPostalCode: "46278",
+			addressState: "IN",
+			phoneNumber: "(555) 867-5309",
+			phoneType: 'Cell',
+			customerId: '59606',
+			// These fields should be provided via advanced configuration
+			// firstName: 'Praenomen',
+			// lastName: 'Gens',
+			// email: 'praenomen.gens@calidumlitterae.com',
+			// subject: 'Chat subject'
+			}	
+		}
+	}		
+};
+</script>
+
+<script>
+
+if(!window._genesys.widgets.extensions){
+
+    window._genesys.widgets.extensions = {};
+}
+
+window._genesys.widgets.extensions["TestExtension"] = function($, CXBus, Common){
+
+    var oTestExtension = CXBus.registerPlugin("TestExtension");
+
+    oTestExtension.subscribe("WebChat.opened", function(e){});
+
+    oTestExtension.republish("ready"); // Publishes "TestExtension.ready"
+
+oTestExtension.subscribe('WebChatService.ended', function (e) {
+
+      console.log('Chat ended', e);
+
+                  window.open("https://www.smasco.com");
+/*
+    oTestExtension.command("WebChat.open").done(function(e){
+
+          // Handle success return state
+
+*/				  
+//    }).fail(function(e){
+
+          // Handle failure return state
+//    });
+
+    oTestExtension.registerCommand("demo", function(e){
+
+          // Command execution here
+
+          e.deferred.resolve(); // or e.deferred.reject(); if the command cannot complete
+    });
+
+    oTestExtension.ready();
+};
+
+</script>
+
+ <script src="https://apps.mypurecloud.com/widgets/9.0/cxbus.min.js" onload="javascript:CXBus.configure({debug:false,pluginsPath:'https://apps.mypurecloud.com/widgets/9.0/plugins/'}); CXBus.loadPlugin('widgets-core');"></script>
+
+	<script>
+    const customPlugin = CXBus.registerPlugin('Custom');
+
+    customPlugin.subscribe('WebChatService.started', function (e) {
+      console.log('Chat started', e);
+    });
+
+    customPlugin.subscribe('WebChatService.ended', function (e) {
+      console.log('Chat ended', e);
+    });
+	</script>
+	
+<button type="button" id="chat-button" onclick="customPlugin.command('WebChat.open', getAdvancedConfig());">Start Chat</button>
+
+  <script type="text/javascript">
+		function getAdvancedConfig() {
+			return {
+				form: {
+					autoSubmit: false,
+					firstname: 'Joe',
+					lastname: 'Customer',
+					email: 'eps@genesys.com',
+					subject: 'Populated from data'
+				},
+				formJSON: {
+					wrapper: '<table></table>',
+					inputs: [
+						// Default fields
+						{
+							id: 'cx_webchat_form_firstname',
+							name: 'firstname',
+							maxlength: '100',
+							placeholder: 'Required',
+							label: 'First Name'
+						},
+						{
+							id: 'cx_webchat_form_lastname',
+							name: 'lastname',
+							maxlength: '100',
+							placeholder: 'Required',
+							label: 'Last Name'
+						},
+						{
+							id: 'cx_webchat_form_email',
+							name: 'email', 
+							maxlength: '100',
+							placeholder: 'Optional',
+							label: 'Email'
+						},
+						{
+							id: 'cx_webchat_form_subject', 
+							name: 'subject', 
+							maxlength: '100',
+							placeholder: 'Optional',
+							label: 'Subject'
+						},
+						// Custom Fields
+						{
+							id: 'custom_field_1', 
+							name: 'customField1', 
+							maxlength: '100',
+							placeholder: 'Custom Data',
+							label: 'Custom Field 1',
+							value: 'My Custom Value'
+						}
+					]
+				}
+			};
+		}
+	</script>
+	<button type="button" id="chat-button" onclick="customPlugin.command('WebChat.open', getAdvancedConfig());">Start Chat (with data)</button>
+
+
+<script>
+  (function(a,t,c,l,o,u,d){a['_genesysJourneySdk']=o;a[o]=a[o]||function(){
+  (a[o].q=a[o].q||[]).push(arguments)},a[o].l=1*new Date();u=t.createElement(c),
+  d=t.getElementsByTagName(c)[0];u.async=1;u.src=l;u.charset='utf-8';d.parentNode.insertBefore(u,d)
+  })(window, document, 'script', 'https://apps.mypurecloud.com/journey/sdk/js/web/v1/ac.js', 'ac');
+  ac('init', 'cd1a6845-a95b-4f07-8a80-b88434259aa9', { region: 'use1' });
+  ac('pageview');
+</script>
+
+</body>
+</html>
+<!-- comment -->

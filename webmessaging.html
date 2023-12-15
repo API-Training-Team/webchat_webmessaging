@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<p>Genesys Cloud WebMessaging test page</p>
+
+	<ul>
+		<li> <a href="index.html">Genesys Test Site Home Page</a> </li>
+	</ul>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Genesys Cloud WebMessaging Example</title>
+</head>
+<body>
+
+    <h1>Genesys Cloud WebMessaging Example</h1>
+	
+<script type="text/javascript" charset="utf-8">
+  (function (g, e, n, es, ys) {
+    g['_genesysJs'] = e;
+    g[e] = g[e] || function () {
+      (g[e].q = g[e].q || []).push(arguments)
+    };
+    g[e].t = 1 * new Date();
+    g[e].c = es;
+    ys = document.createElement('script'); ys.async = 1; ys.src = n; ys.charset = 'utf-8'; document.head.appendChild(ys);
+  })(window, 'Genesys', 'https://apps.usw2.pure.cloud/genesys-bootstrap/genesys.min.js', {
+    environment: 'usw2',
+    deploymentId: 'd0d76dd4-6add-4831-a0c4-3eb1edc40c12'
+  });
+
+Genesys("command", "Database.set", {
+  messaging: {
+    customAttributes: {
+      department: "AWESOME",
+      property_type: "Flavor Town USA",
+      device: "Guy"
+    }
+  }
+});
+</script>
+
+
+	
+<script>
+  (function(a,t,c,l,o,u,d){a['_genesysJourneySdk']=o;a[o]=a[o]||function(){
+  (a[o].q=a[o].q||[]).push(arguments)},a[o].l=1*new Date();u=t.createElement(c),
+  d=t.getElementsByTagName(c)[0];u.async=1;u.src=l;u.charset='utf-8';d.parentNode.insertBefore(u,d)
+  })(window, document, 'script', 'https://apps.mypurecloud.com/journey/sdk/js/web/v1/ac.js', 'ac');
+  ac('init', 'cd1a6845-a95b-4f07-8a80-b88434259aa9', { region: 'use1' });
+  ac('pageview');
+</script>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<p>Co-Browse test page</p>
+
+	<ul>
+		<li> <a href="index.html">Genesys Test Site Home Page</a> </li>
+	</ul>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Simple co-browse with chat example</title>
+</head>
+<body>
+
+    <h1>Simple co-browse with chat example where a new window will pop up</h1>
+	<h1>DISABLE YOUR POPUP BLOCKER</h1>
+
+    <div id="chatContainer" style="height:600px"></div>
+
+    <!-- Replace mypurecloud.com with the hostname for your PureCloud region -->
+    <script src="https://apps.usw2.pure.cloud/webchat/jsapi-v1.js" type="text/javascript"></script>
+	
+<script
+  id="purecloud-webchat-js"
+  type="text/javascript"
+  src="https://apps.usw2.pure.cloud/webchat/jsapi-v1.js"
+  region="us-west-2"
+  org-guid="9e0586e0-678f-455c-aede-039a8804c0d4"
+  deployment-key="fb340faf-b3bc-4410-95af-be99b36eee33"
+></script>
+<!-- deployment-key above is for general chat deployment-key NOT the deployment-key for co-browse -->
+	  
+    <script type="text/javascript">
+let chatConfig = {
+  "webchatAppUrl": "https://apps.usw2.pure.cloud/webchat",
+  "webchatServiceUrl": "https://realtime.usw2.pure.cloud:443",
+  "orgId": "3894",
+  "orgGuid": "9e0586e0-678f-455c-aede-039a8804c0d4",
+  "orgName": " kwelschdev",
+  "queueName": "API Support",
+  "logLevel": "DEBUG",
+  "locale": "en",
+  "data": {
+    "firstName": "Joe",
+    "lastName": "Customer",
+    "addressStreet": "ABC Street",
+    "addressCity": "New York",
+    "addressPostalCode": "10000",
+    "addressState": "NY",
+    "phoneNumber": "5558675309",
+    "customField1Label": "",
+    "customField1": "",
+    "customField2Label": "",
+    "customField2": "",
+    "customField3Label": "",
+    "customField3": ""
+  },
+  "companyLogo": {
+    "width": 600,
+    "height": 149,
+    "url": "https://d3a63qt71m2kua.cloudfront.net/developer-tools/1780/assets/images/PC-blue-nomark.png"
+  },
+  "companyLogoSmall": {
+    "width": 25,
+    "height": 25,
+    "url": "https://d3a63qt71m2kua.cloudfront.net/developer-tools/1780/assets/images/companylogo.png"
+  },
+  "agentAvatar": {
+    "width": 462,
+    "height": 462,
+    "url": "https://d3a63qt71m2kua.cloudfront.net/developer-tools/1780/assets/images/agent.jpg"
+  },
+  "welcomeMessage": "Thanks for chatting using version 1.0.",
+  "cssClass": "webchat-frame",
+  "css": {
+    "width": "100%",
+    "height": "100%"
+  }
+};
+
+ININ.webchat.create(chatConfig, function(err, webchat) {
+    if (err) {
+        console.error(err);
+        throw err;
+    }
+
+    webchat.renderPopup({
+        width: 400,
+        height: 400,
+        title: 'Chat'
+    });
+});
+    </script>
+	
+<script>
+  (function(a,t,c,l,o,u,d){a['_genesysJourneySdk']=o;a[o]=a[o]||function(){
+  (a[o].q=a[o].q||[]).push(arguments)},a[o].l=1*new Date();u=t.createElement(c),
+  d=t.getElementsByTagName(c)[0];u.async=1;u.src=l;u.charset='utf-8';d.parentNode.insertBefore(u,d)
+  })(window, document, 'script', 'https://apps.mypurecloud.com/journey/sdk/js/web/v1/ac.js', 'ac');
+  ac('init', 'cd1a6845-a95b-4f07-8a80-b88434259aa9', { region: 'use1' });
+  ac('pageview');
+</script>
+
+</body>
+</html>
