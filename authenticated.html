@@ -19,18 +19,20 @@
     <div id="login-message"></div>
 
     <script type="text/javascript">
-        // Configuração Okta (SUBSTITUA COM SEUS DADOS)
+        // Configuração do Okta (SUBSTITUA COM SEUS DADOS)
         const oktaConfig = {
             clientId: "0oanh1tn2aD6SvlNm5d7",
             issuer: "https://dev-74567406.okta.com/oauth2/default",
             redirectUri: "https://api-training-team.github.io/webchat_webmessaging/authenticated.html",
-            scopes: ["openid", "profile", "email"],
+            scopes: ["openid", "profile", "email", "offline_access"], // Permissões do usuário
             responseType: "code",
-            pkce: true
+            pkce: false, // DESATIVANDO PKCE, conforme solicitado
+            maxAge: 3600 // Tempo máximo da sessão (1 hora)
         };
 
         const authClient = new OktaAuth(oktaConfig);
 
+        // Verifica se o usuário está autenticado
         async function checkAuthentication() {
             const token = await authClient.tokenManager.get('idToken');
 
@@ -42,18 +44,27 @@
             }
         }
 
-        // Redireciona o usuário para o fluxo de login do Okta
-        async function login() {
-            const tokenResponse = await authClient.token.getWithRedirect({
-                responseType: ['code']
-            });
+        // Redireciona para o login do Okta (Sem PKCE)
+        function login() {
+            const authUrl = `https://dev-74567406.okta.com/oauth2/default/v1/authorize
+                ?client_id=${oktaConfig.clientId}
+                &scope=${encodeURIComponent(oktaConfig.scopes.join(" "))}
+                &response_type=code
+                &redirect_uri=${encodeURIComponent(oktaConfig.redirectUri)}
+                &state=random-state-value`;
+
+            window.location.href = authUrl;
         }
 
-        // Após login, troca o código de autorização por um token JWT
+        // Após login, troca o código de autorização por um token de acesso
         async function handleLoginCallback() {
-            const tokenResponse = await authClient.token.parseFromUrl();
-            authClient.tokenManager.setTokens(tokenResponse.tokens);
-            checkAuthentication();
+            try {
+                const tokenResponse = await authClient.token.parseFromUrl();
+                authClient.tokenManager.setTokens(tokenResponse.tokens);
+                checkAuthentication();
+            } catch (error) {
+                console.error("Erro ao obter tokens do Okta:", error);
+            }
         }
 
         // Inicializa Genesys Web Messaging com autenticação JWT
@@ -81,13 +92,13 @@
             });
         }
 
-        // Logout do usuário
+        // Logout do usuário e redireciona para a página inicial
         async function signOut() {
             await authClient.signOut();
             window.location.href = "https://api-training-team.github.io/webchat_webmessaging/";
         }
 
-        // Verifica se estamos na callback do login
+        // Verifica se estamos na página de callback do login e processa a autenticação
         if (window.location.href.includes("code=")) {
             handleLoginCallback();
         } else {
