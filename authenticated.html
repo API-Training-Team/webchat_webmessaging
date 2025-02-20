@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <title>Genesys Cloud Authenticated WebMessaging Example</title>
     <script src="https://global.oktacdn.com/okta-auth-js/7.4.2/okta-auth-js.min.js"></script>
-    <script src="https://global.oktacdn.com/okta-signin-widget/7.4.1/js/okta-sign-in.min.js"></script>
-    <link href="https://global.oktacdn.com/okta-signin-widget/7.4.1/css/okta-sign-in.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -18,44 +16,48 @@
         <li><a href="#" onclick="signOut()">Sign Out</a></li>
     </ul>
 
-    <div id="okta-login-container"></div>
+    <div id="login-message"></div>
 
     <script type="text/javascript">
-        // Okta Configuration
+        // Configuração Okta (SUBSTITUA COM SEUS DADOS)
         const oktaConfig = {
             clientId: "0oanh1tn2aD6SvlNm5d7",
             issuer: "https://dev-74567406.okta.com/oauth2/default",
             redirectUri: "https://api-training-team.github.io/webchat_webmessaging/authenticated.html",
             scopes: ["openid", "profile", "email"],
-            responseType: "id_token"
+            responseType: "code",
+            pkce: true
         };
 
         const authClient = new OktaAuth(oktaConfig);
 
-        const signInWidget = new OktaSignIn({
-            baseUrl: "https://dev-74567406.okta.com/",
-            clientId: oktaConfig.clientId,
-            redirectUri: oktaConfig.redirectUri,
-            authParams: {
-                issuer: oktaConfig.issuer,
-                scopes: oktaConfig.scopes
-            }
-        });
+        async function checkAuthentication() {
+            const token = await authClient.tokenManager.get('idToken');
 
-        // Check if user is authenticated
-        authClient.token.getUserInfo().then(user => {
-            if (user) {
-                document.getElementById("okta-login-container").innerHTML = `<p>Welcome, ${user.name}!</p>`;
-                initializeGenesysWebMessaging(user);
+            if (token) {
+                document.getElementById("login-message").innerHTML = `<p>Welcome, ${token.claims.name}!</p>`;
+                initializeGenesysWebMessaging(token);
             } else {
-                signInWidget.renderEl({ el: "#okta-login-container" });
+                login();
             }
-        }).catch(() => {
-            signInWidget.renderEl({ el: "#okta-login-container" });
-        });
+        }
 
-        // Initialize Genesys Cloud Messenger with authentication token
-        function initializeGenesysWebMessaging(user) {
+        // Redireciona o usuário para o fluxo de login do Okta
+        async function login() {
+            const tokenResponse = await authClient.token.getWithRedirect({
+                responseType: ['code']
+            });
+        }
+
+        // Após login, troca o código de autorização por um token JWT
+        async function handleLoginCallback() {
+            const tokenResponse = await authClient.token.parseFromUrl();
+            authClient.tokenManager.setTokens(tokenResponse.tokens);
+            checkAuthentication();
+        }
+
+        // Inicializa Genesys Web Messaging com autenticação JWT
+        function initializeGenesysWebMessaging(token) {
             (function (g, e, n, es, ys) {
                 g['_genesysJs'] = e;
                 g[e] = g[e] || function () {
@@ -73,17 +75,23 @@
                 deploymentId: '243dcd97-e195-49bd-b234-bb405c772b66',
                 messenger: {
                     authentication: {
-                        jwt: user.idToken // Pass Okta ID token to Genesys Messenger
+                        jwt: token.idToken
                     }
                 }
             });
         }
 
-        // Logout Function
-        function signOut() {
-            authClient.signOut().then(() => {
-                window.location.href = "https://api-training-team.github.io/webchat_webmessaging/";
-            });
+        // Logout do usuário
+        async function signOut() {
+            await authClient.signOut();
+            window.location.href = "https://api-training-team.github.io/webchat_webmessaging/";
+        }
+
+        // Verifica se estamos na callback do login
+        if (window.location.href.includes("code=")) {
+            handleLoginCallback();
+        } else {
+            checkAuthentication();
         }
     </script>
 
