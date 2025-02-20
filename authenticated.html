@@ -23,8 +23,8 @@
     <script type="text/javascript">
         // Okta Configuration
         const oktaConfig = {
-            clientId: "YOUR_OKTA_CLIENT_ID",
-            issuer: "https://YOUR_OKTA_DOMAIN/oauth2/default",
+            clientId: "0oanh1tn2aD6SvlNm5d7",
+            issuer: "https://dev-74567406.okta.com/oauth2/default",
             redirectUri: "https://api-training-team.github.io/webchat_webmessaging/authenticated.html",
             scopes: ["openid", "profile", "email"],
             responseType: "id_token"
@@ -33,7 +33,7 @@
         const authClient = new OktaAuth(oktaConfig);
 
         const signInWidget = new OktaSignIn({
-            baseUrl: "https://YOUR_OKTA_DOMAIN",
+            baseUrl: "https://dev-74567406.okta.com/",
             clientId: oktaConfig.clientId,
             redirectUri: oktaConfig.redirectUri,
             authParams: {
