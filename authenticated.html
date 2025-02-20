@@ -17,34 +17,34 @@
     </ul>
 
     <div id="login-message"></div>
+    <div id="messenger-container"></div> <!-- Container para Messenger -->
 
     <script type="text/javascript">
         // Configuração do Okta (SUBSTITUA COM SEUS DADOS)
         const oktaConfig = {
-            clientId: "0oanh1tn2aD6SvlNm5d7",
+            clientId: "YOUR_OKTA_CLIENT_ID",
             issuer: "https://dev-74567406.okta.com/oauth2/default",
             redirectUri: "https://api-training-team.github.io/webchat_webmessaging/authenticated.html",
-            scopes: ["openid", "profile", "email", "offline_access"], // Permissões do usuário
+            scopes: ["openid", "profile", "email", "offline_access"],
             responseType: "code",
-            pkce: false, // DESATIVANDO PKCE, conforme solicitado
-            maxAge: 3600 // Tempo máximo da sessão (1 hora)
+            pkce: false, // Sem PKCE
+            maxAge: 3600
         };
 
         const authClient = new OktaAuth(oktaConfig);
 
-        // Verifica se o usuário está autenticado
         async function checkAuthentication() {
             const token = await authClient.tokenManager.get('idToken');
 
             if (token) {
                 document.getElementById("login-message").innerHTML = `<p>Welcome, ${token.claims.name}!</p>`;
-                initializeGenesysWebMessaging(token);
+                initializeGenesysWebMessaging(token.idToken);
             } else {
                 login();
             }
         }
 
-        // Redireciona para o login do Okta (Sem PKCE)
+        // Função para redirecionar o usuário para o login do Okta
         function login() {
             const authUrl = `https://dev-74567406.okta.com/oauth2/default/v1/authorize
                 ?client_id=${oktaConfig.clientId}
@@ -56,7 +56,7 @@
             window.location.href = authUrl;
         }
 
-        // Após login, troca o código de autorização por um token de acesso
+        // Após login, troca o código de autorização por um token JWT
         async function handleLoginCallback() {
             try {
                 const tokenResponse = await authClient.token.parseFromUrl();
@@ -68,7 +68,14 @@
         }
 
         // Inicializa Genesys Web Messaging com autenticação JWT
-        function initializeGenesysWebMessaging(token) {
+        function initializeGenesysWebMessaging(jwtToken) {
+            console.log("Iniciando Genesys Web Messaging...");
+            
+            if (!jwtToken) {
+                console.error("JWT não encontrado! O Genesys Messenger não será inicializado.");
+                return;
+            }
+
             (function (g, e, n, es, ys) {
                 g['_genesysJs'] = e;
                 g[e] = g[e] || function () {
@@ -80,13 +87,19 @@
                 ys.async = 1;
                 ys.src = n;
                 ys.charset = 'utf-8';
+                ys.onload = function () {
+                    console.log("Genesys Web Messenger carregado com sucesso!");
+                };
+                ys.onerror = function () {
+                    console.error("Erro ao carregar Genesys Web Messenger.");
+                };
                 document.head.appendChild(ys);
             })(window, 'Genesys', 'https://apps.mypurecloud.ie/genesys-bootstrap/genesys.min.js', {
                 environment: 'prod-euw1',
                 deploymentId: '243dcd97-e195-49bd-b234-bb405c772b66',
                 messenger: {
                     authentication: {
-                        jwt: token.idToken
+                        jwt: jwtToken
                     }
                 }
             });
