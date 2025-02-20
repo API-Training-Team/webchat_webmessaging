@@ -44,17 +44,20 @@
         }
 
         // Redireciona o usuário para o login do Okta (Sem PKCE)
-        function login() {
+         function login() {
             console.log("Redirecionando para login do Okta...");
-            const authUrl = `https://dev-74567406.okta.com/oauth2/default/v1/authorize
-                ?client_id=${oktaConfig.clientId}
-                &scope=${encodeURIComponent(oktaConfig.scopes.join(" "))}
-                &response_type=code
-                &redirect_uri=${encodeURIComponent(oktaConfig.redirectUri)}
-                &state=random-state-value`;
-
+        
+            const authUrl = "https://dev-74567406.okta.com/oauth2/default/v1/authorize"
+                + "?client_id=" + encodeURIComponent(oktaConfig.clientId)
+                + "&scope=" + encodeURIComponent(oktaConfig.scopes.join(" "))
+                + "&response_type=code"
+                + "&redirect_uri=" + encodeURIComponent(oktaConfig.redirectUri)
+                + "&state=random-state-value";
+        
+            console.log("URL de login gerada:", authUrl); // Adiciona um log para depuração
             window.location.href = authUrl;
         }
+
 
         // Após login, troca o código de autorização por um token de acesso
         async function handleLoginCallback() {
