@@ -21,86 +21,75 @@
     <script type="text/javascript">
         // Configuração do Okta (SUBSTITUA COM SEUS DADOS)
         const oktaConfig = {
-            clientId: "0oanh1tn2aD6SvlNm5d7",
+            clientId: "YOUR_OKTA_CLIENT_ID",
             issuer: "https://dev-74567406.okta.com/oauth2/default",
             redirectUri: "https://api-training-team.github.io/webchat_webmessaging/authenticated.html",
             scopes: ["openid", "profile", "email", "offline_access"], 
             responseType: "code",
             pkce: false, // Sem PKCE
-            maxAge: 3600 // Tempo máximo da sessão (1h)
+            maxAge: 3600
         };
 
         const authClient = new OktaAuth(oktaConfig);
 
         async function checkAuthentication() {
-            const token = await authClient.tokenManager.get('idToken');
+            try {
+                const token = await authClient.tokenManager.get('idToken');
 
-            if (token) {
-                document.getElementById("login-message").innerHTML = `<p>Welcome, ${token.claims.name}!</p>`;
-                initializeGenesysWebMessaging(token.idToken);
-            } else {
+                if (token) {
+                    document.getElementById("login-message").innerHTML = `<p>Welcome, ${token.claims.name}!</p>`;
+                    initializeGenesysWebMessaging(token.idToken);
+                } else {
+                    console.log("Usuário não autenticado. Iniciando login...");
+                    login();
+                }
+            } catch (error) {
+                console.error("Erro ao verificar autenticação:", error);
                 login();
             }
         }
 
-        // Redireciona o usuário para o login do Okta (Sem PKCE)
-        function login() {
+        // Inicia o login via Okta Auth SDK
+        async function login() {
             console.log("Redirecionando para login do Okta...");
-        
-            const baseUrl = "https://dev-74567406.okta.com/oauth2/default/v1/authorize";
-            const params = new URLSearchParams({
-                client_id: oktaConfig.clientId,
-                scope: "openid profile email offline_access",
-                response_type: "code",
-                redirect_uri: oktaConfig.redirectUri,
-                state: "random-state-value"
-         });
 
-    const authUrl = `${baseUrl}?${params.toString()}`;
-    
-    console.log("URL de login gerada:", authUrl); // Depuração
-    window.location.href = authUrl;
-}
-
-
-        // Após login, troca o código de autorização por um token de acesso
-        async function handleLoginCallback() {
             try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const authCode = urlParams.get("code");
-
-                if (!authCode) {
-                    throw new Error("Código de autorização não encontrado na URL! O usuário pode não ter concluído o login corretamente.");
-                }
-
-                console.log("Código de autorização recebido:", authCode);
-
-                // Troca o código por tokens
-                const tokenResponse = await authClient.token.exchangeCodeForTokens({
-                    authorizationCode: authCode,
+                await authClient.token.getWithRedirect({
+                    responseType: "code",
                     scopes: oktaConfig.scopes
                 });
+            } catch (error) {
+                console.error("Erro ao iniciar login:", error);
+            }
+        }
 
-                // Armazena os tokens localmente
+        // Após login, troca o código de autorização por tokens
+        async function handleLoginCallback() {
+            try {
+                const tokenResponse = await authClient.token.parseFromUrl();
+                
+                if (!tokenResponse.tokens || !tokenResponse.tokens.idToken) {
+                    throw new Error("Nenhum token recebido do Okta!");
+                }
+
+                // Armazena os tokens no gerenciador do Okta
                 authClient.tokenManager.setTokens(tokenResponse.tokens);
 
                 console.log("Tokens armazenados com sucesso!");
 
-                // Remove o código da URL para evitar problemas de segurança
+                // Remove código da URL
                 window.history.replaceState({}, document.title, window.location.pathname);
 
                 checkAuthentication();
             } catch (error) {
-                console.error("Erro ao obter tokens do Okta:", error);
-                alert("Erro na autenticação. Tente novamente.");
-                login();
+                console.error("Erro ao processar callback de login:", error);
             }
         }
 
         // Inicializa Genesys Web Messaging com autenticação JWT
         function initializeGenesysWebMessaging(jwtToken) {
             console.log("Iniciando Genesys Web Messaging...");
-            
+
             if (!jwtToken) {
                 console.error("JWT não encontrado! O Genesys Messenger não será inicializado.");
                 return;
