@@ -17,7 +17,6 @@
     </ul>
 
     <div id="login-message"></div>
-    <div id="messenger-container"></div> <!-- Container para Messenger -->
 
     <script type="text/javascript">
         // Configuração do Okta (SUBSTITUA COM SEUS DADOS)
@@ -25,10 +24,10 @@
             clientId: "YOUR_OKTA_CLIENT_ID",
             issuer: "https://dev-74567406.okta.com/oauth2/default",
             redirectUri: "https://api-training-team.github.io/webchat_webmessaging/authenticated.html",
-            scopes: ["openid", "profile", "email", "offline_access"],
+            scopes: ["openid", "profile", "email", "offline_access"], // offline_access para refresh token
             responseType: "code",
             pkce: false, // Sem PKCE
-            maxAge: 3600
+            maxAge: 3600 // Tempo máximo da sessão (1h)
         };
 
         const authClient = new OktaAuth(oktaConfig);
@@ -44,7 +43,7 @@
             }
         }
 
-        // Função para redirecionar o usuário para o login do Okta
+        // Redireciona o usuário para o login do Okta (Sem PKCE)
         function login() {
             const authUrl = `https://dev-74567406.okta.com/oauth2/default/v1/authorize
                 ?client_id=${oktaConfig.clientId}
@@ -56,11 +55,28 @@
             window.location.href = authUrl;
         }
 
-        // Após login, troca o código de autorização por um token JWT
+        // Após login, troca o código de autorização por um token de acesso
         async function handleLoginCallback() {
             try {
-                const tokenResponse = await authClient.token.parseFromUrl();
+                const urlParams = new URLSearchParams(window.location.search);
+                const authCode = urlParams.get("code");
+
+                if (!authCode) {
+                    throw new Error("Código de autorização não encontrado na URL!");
+                }
+
+                // Troca o código por tokens
+                const tokenResponse = await authClient.token.exchangeCodeForTokens({
+                    authorizationCode: authCode,
+                    scopes: oktaConfig.scopes
+                });
+
+                // Armazena os tokens localmente
                 authClient.tokenManager.setTokens(tokenResponse.tokens);
+
+                // Remove o código da URL para evitar problemas de segurança
+                window.history.replaceState({}, document.title, window.location.pathname);
+
                 checkAuthentication();
             } catch (error) {
                 console.error("Erro ao obter tokens do Okta:", error);
