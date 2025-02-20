@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+	<head lang="en">
+	    <meta charset="UTF-8">
+	    <title>Genesys Cloud Authenticated WebMessaging Example</title>
+	</head>
+	<body>
+	
+		<h1>Genesys Cloud WebMessaging Example</h1>
+	
+	   
+		<ul>
+			<li> <a href="index.html">Genesys Test Site Home Page</a> </li>
+		</ul>
+		
+	<script type="text/javascript" charset="utf-8">
+	(function (g, e, n, es, ys) {
+		g['_genesysJs'] = e;
+		g[e] = g[e] || function () {
+		(g[e].q = g[e].q || []).push(arguments)
+		};
+		g[e].t = 1 * new Date();
+		g[e].c = es;
+		ys = document.createElement('script'); ys.async = 1; ys.src = n; ys.charset = 'utf-8'; document.head.appendChild(ys);
+		})(window, 'Genesys', 'https://apps.mypurecloud.ie/genesys-bootstrap/genesys.min.js', {
+		environment: 'prod-euw1',
+		deploymentId: '7a06a11d-b2e2-4b7e-ac25-a5021edef233'
+	});
+	</script>	
+	
+	
+	</body>
+</html>
