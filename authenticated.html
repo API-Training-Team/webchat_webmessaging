@@ -24,7 +24,7 @@
             clientId: "YOUR_OKTA_CLIENT_ID",
             issuer: "https://dev-74567406.okta.com/oauth2/default",
             redirectUri: "https://api-training-team.github.io/webchat_webmessaging/authenticated.html",
-            scopes: ["openid", "profile", "email", "offline_access"], // offline_access para refresh token
+            scopes: ["openid", "profile", "email", "offline_access"], 
             responseType: "code",
             pkce: false, // Sem PKCE
             maxAge: 3600 // Tempo máximo da sessão (1h)
@@ -45,6 +45,7 @@
 
         // Redireciona o usuário para o login do Okta (Sem PKCE)
         function login() {
+            console.log("Redirecionando para login do Okta...");
             const authUrl = `https://dev-74567406.okta.com/oauth2/default/v1/authorize
                 ?client_id=${oktaConfig.clientId}
                 &scope=${encodeURIComponent(oktaConfig.scopes.join(" "))}
@@ -62,8 +63,10 @@
                 const authCode = urlParams.get("code");
 
                 if (!authCode) {
-                    throw new Error("Código de autorização não encontrado na URL!");
+                    throw new Error("Código de autorização não encontrado na URL! O usuário pode não ter concluído o login corretamente.");
                 }
+
+                console.log("Código de autorização recebido:", authCode);
 
                 // Troca o código por tokens
                 const tokenResponse = await authClient.token.exchangeCodeForTokens({
@@ -74,12 +77,16 @@
                 // Armazena os tokens localmente
                 authClient.tokenManager.setTokens(tokenResponse.tokens);
 
+                console.log("Tokens armazenados com sucesso!");
+
                 // Remove o código da URL para evitar problemas de segurança
                 window.history.replaceState({}, document.title, window.location.pathname);
 
                 checkAuthentication();
             } catch (error) {
                 console.error("Erro ao obter tokens do Okta:", error);
+                alert("Erro na autenticação. Tente novamente.");
+                login();
             }
         }
 
