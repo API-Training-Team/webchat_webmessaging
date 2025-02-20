@@ -1,33 +1,92 @@
 <!DOCTYPE html>
+<html lang="en">
 
-	<head lang="en">
-	    <meta charset="UTF-8">
-	    <title>Genesys Cloud Authenticated WebMessaging Example</title>
-	</head>
-	<body>
-	
-		<h1>Genesys Cloud WebMessaging Example</h1>
-	
-	   
-		<ul>
-			<li> <a href="index.html">Genesys Test Site Home Page</a> </li>
-		</ul>
-		
-	<script type="text/javascript" charset="utf-8">
-	  (function (g, e, n, es, ys) {
-	    g['_genesysJs'] = e;
-	    g[e] = g[e] || function () {
-	      (g[e].q = g[e].q || []).push(arguments)
-	    };
-	    g[e].t = 1 * new Date();
-	    g[e].c = es;
-	    ys = document.createElement('script'); ys.async = 1; ys.src = n; ys.charset = 'utf-8'; document.head.appendChild(ys);
-	  })(window, 'Genesys', 'https://apps.mypurecloud.ie/genesys-bootstrap/genesys.min.js', {
-	    environment: 'prod-euw1',
-	    deploymentId: '243dcd97-e195-49bd-b234-bb405c772b66'
-	  });
-	</script>
-	
-	
-	</body>
+<head>
+    <meta charset="UTF-8">
+    <title>Genesys Cloud Authenticated WebMessaging Example</title>
+    <script src="https://global.oktacdn.com/okta-auth-js/7.4.2/okta-auth-js.min.js"></script>
+    <script src="https://global.oktacdn.com/okta-signin-widget/7.4.1/js/okta-sign-in.min.js"></script>
+    <link href="https://global.oktacdn.com/okta-signin-widget/7.4.1/css/okta-sign-in.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <h1>Genesys Cloud WebMessaging Example</h1>
+
+    <ul>
+        <li><a href="index.html">Genesys Test Site Home Page</a></li>
+        <li><a href="#" onclick="signOut()">Sign Out</a></li>
+    </ul>
+
+    <div id="okta-login-container"></div>
+
+    <script type="text/javascript">
+        // Okta Configuration
+        const oktaConfig = {
+            clientId: "YOUR_OKTA_CLIENT_ID",
+            issuer: "https://YOUR_OKTA_DOMAIN/oauth2/default",
+            redirectUri: "https://api-training-team.github.io/webchat_webmessaging/authenticated.html",
+            scopes: ["openid", "profile", "email"],
+            responseType: "id_token"
+        };
+
+        const authClient = new OktaAuth(oktaConfig);
+
+        const signInWidget = new OktaSignIn({
+            baseUrl: "https://YOUR_OKTA_DOMAIN",
+            clientId: oktaConfig.clientId,
+            redirectUri: oktaConfig.redirectUri,
+            authParams: {
+                issuer: oktaConfig.issuer,
+                scopes: oktaConfig.scopes
+            }
+        });
+
+        // Check if user is authenticated
+        authClient.token.getUserInfo().then(user => {
+            if (user) {
+                document.getElementById("okta-login-container").innerHTML = `<p>Welcome, ${user.name}!</p>`;
+                initializeGenesysWebMessaging(user);
+            } else {
+                signInWidget.renderEl({ el: "#okta-login-container" });
+            }
+        }).catch(() => {
+            signInWidget.renderEl({ el: "#okta-login-container" });
+        });
+
+        // Initialize Genesys Cloud Messenger with authentication token
+        function initializeGenesysWebMessaging(user) {
+            (function (g, e, n, es, ys) {
+                g['_genesysJs'] = e;
+                g[e] = g[e] || function () {
+                    (g[e].q = g[e].q || []).push(arguments);
+                };
+                g[e].t = 1 * new Date();
+                g[e].c = es;
+                ys = document.createElement('script');
+                ys.async = 1;
+                ys.src = n;
+                ys.charset = 'utf-8';
+                document.head.appendChild(ys);
+            })(window, 'Genesys', 'https://apps.mypurecloud.ie/genesys-bootstrap/genesys.min.js', {
+                environment: 'prod-euw1',
+                deploymentId: '243dcd97-e195-49bd-b234-bb405c772b66',
+                messenger: {
+                    authentication: {
+                        jwt: user.idToken // Pass Okta ID token to Genesys Messenger
+                    }
+                }
+            });
+        }
+
+        // Logout Function
+        function signOut() {
+            authClient.signOut().then(() => {
+                window.location.href = "https://api-training-team.github.io/webchat_webmessaging/";
+            });
+        }
+    </script>
+
+</body>
+
 </html>
