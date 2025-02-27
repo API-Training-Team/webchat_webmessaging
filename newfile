@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+	<meta name="generator" content="Jekyll v4.1.1">
+	<title>Messenger with Authentication</title>
+
+	<!-- Bootstrap core CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+		integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+	<style>
+		body {
+			background: url("images/messenger-bg.png"), url("images/auth-bg.png");
+			background-position: right top, left top;
+			background-repeat: no-repeat;
+			overflow-x: hidden;
+		}
+
+		main {
+			margin: 0 auto;
+		}
+
+		.formLabel {
+			-webkit-transform: scale(0.75) translateY(29px);
+			transform: scale(0.75) translateY(29px);
+			background: #fff;
+			bottom: 17px;
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+			color: #5f6368;
+			font-size: 18px;
+			font-weight: 400;
+			left: 8px;
+			max-width: -webkit-calc(100% - (2*8px));
+			max-width: calc(100% - (2*8px));
+			overflow: hidden;
+			padding: 0 8px;
+			text-overflow: ellipsis;
+			-webkit-transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+			transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+			white-space: nowrap;
+			width: auto;
+			z-index: 1;
+		}
+
+		.bd-placeholder-img {
+			font-size: 1.125rem;
+			text-anchor: middle;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+
+		@media (min-width: 768px) {
+			.bd-placeholder-img-lg {
+				font-size: 3.5rem;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<nav class="navbar navbar-light bg-dark justify-content-between">
+		<a class="navbar-brand"></a>
+		<form class="form-inline">
+			<div class="form-group">
+				<label class="pr-3" style="color: #fff" for="selectLanguage">Select Language</label>
+				<select class="form-control" id="selectLanguage" onchange="updateMessengerLocale()">
+					<option selected value="en-us">English</option>
+					<option value="cs">Czech</option>
+					<option value="da">Danish</option>
+					<option value="de">German</option>
+					<option value="es">Spanish</option>
+					<option value="fi">Finnish</option>
+					<option value="it">Italian</option>
+					<option value="ko">Korean</option>
+					<option value="nl">Dutch</option>
+					<option value="no">Norwegian</option>
+					<option value="pt-br">Portugese</option>
+					<option value="sv">Swedish</option>
+					<option value="th">Thai</option>
+					<option value="tr">Turkish</option>
+					<option value="zh-cn">Chinese China</option>
+					<option value="zh-tw">Chinese Taiwan</option>
+					<option value="fr">French</option>
+					<option value="ja">Japanese</option>
+					<option value="pl">Polish</option>
+					<option value="ru">Russian</option>
+					<option value="ar">Arabic</option>
+					<option value="he">Hebrew</option>
+				</select>
+			</div>
+		</form>
+	</nav>
+
+	<main>
+
+		<!-- Main jumbotron for a primary marketing message or call to action -->
+		<!-- <div class="jumbotron text-center"> -->
+		<div class="container-fluid">
+			<div class="row text-center">
+				<div class="col-sm-12 mt-2">
+					<h2>Messenger with Authentication</h2>
+					<p>Enables the new sign in experience with OKTA Identity provider</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4">
+					<div class="card mb-4 shadow-sm">
+						<div class="card-header text-center">
+							Enter your deployment details
+						</div>
+						<div class="card-body pt-0">
+							<label class="formLabel" for="enter_deploymentId">Enter Deployment ID</label>
+							<input type="text" id="enter_deploymentId" class="form-control" required autofocus>
+							<label class="formLabel" for="enter_environment">Choose Environment</label>
+							<select class="form-control" id="enter_environment">
+								<option value="apne1">Prod APNE1</option>
+								<option value="apne2">Prod APNE2</option>
+								<option value="apse2">Prod APSE2</option>
+								<option value="aps1">Prod APS1</option>
+								<option value="cac1">Prod CAC1</option>
+								<option value="euc1">Prod EUC1</option>
+								<option value="euw1">Prod EUW1</option>
+								<option value="euw2">Prod EUW2</option>
+								<option value="use1" selected>Prod USE1</option>
+								<option value="usw2">Prod USW2</option>
+								<option value="fedramp-use2">Prod FEDRAMP-USE2</option>
+								<option value="maximus-use2">Prod MAXIMUS-USE2</option>
+							</select>
+						</div>
+						<div class="card-footer text-muted text-center">
+
+							<button class="btn btn-md btn-primary" type="submit" onclick="submit()">Submit</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<div class="row justify-content-md-center mb-1">
+				<div class="col-md-3" id="okta_sign_in">
+					<div class="card">
+						<div class="card-header" id="signButton">
+							<button class="btn btn-primary btn-block collapsed" id="signInButton" data-toggle="collapse"
+								data-target="#signin" aria-expanded="false" aria-controls="signin" disabled>
+								Sign In with OKTA
+							</button>
+						</div>
+
+						<div id="signin" class="collapse" aria-labelledby="signButton" data-parent="#okta_sign_in">
+							<div class="card-body pt-0 pb-0">
+								<label for="authClientId" class="formLabel">Client Id</label>
+								<input type="text" id="authClientId" class="form-control" required>
+								<label for="oktaURL" class="formLabel">OKTA URL</label>
+								<input type="text" id="oktaURL" class="form-control" required>
+								<label for="maxAge" class="formLabel">Max Age</label>
+								<input type="number" id="maxAge" class="form-control">
+								<label for="authScope" class="formLabel" style="margin-left: -22px;">Choose your additional auth
+									scope</label>
+								<select class="form-control" id="authScope">
+									<option value="offline_access" selected>offline_access</option>
+									<option value="none">None</option>
+								</select>
+								<label for="oAuthFlow" class="formLabel" style="margin-left: -15px;">Choose your AuthFlow</label>
+								<select class="form-control" id="oAuthFlow">
+									<option value="authorization_code_flow" selected>Authorization Code Flow</option>
+									<option value="pkce_flow">Proof Key Code Exchange Flow</option>
+								</select>
+
+								<div class="row text-center justify-content-md-center gy-5 mt-3 mb-3">
+									<div class="col-sm-12">
+										<button class="btn btn-md btn-primary text-center" id="authLoginBtn">Sign in</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="col-md-3" id="okta_sign_out" style="display: none;">
+					<div class="card">
+						<div class="card-header">
+							<button class="btn btn-md btn-primary btn-block" id="authLogoutBtn">Sign Out</button>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3" id="loading" style="display: none;">
+					<div class="card">
+						<div class="card-header">
+							<button class="btn btn-md btn-primary btn-block">Signing In...</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</main>
+
+	<script src="https://global.oktacdn.com/okta-auth-js/5.2.2/okta-auth-js.min.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+
+		// defaults
+		var sDeploymentId = '';
+		var sEnvironment = '';
+
+		if (window.localStorage.getItem('genesys_deployment_id')) {
+			document.getElementById('enter_deploymentId').value = window.localStorage.getItem('genesys_deployment_id');
+		}
+
+		if (window.localStorage.getItem('genesys_environment')) {
+			document.getElementById('enter_environment').value = window.localStorage.getItem('genesys_environment');
+		}
+
+		function submit() {
+			var deployment_id = document.getElementById('enter_deploymentId').value;
+			window.localStorage.setItem('genesys_deployment_id', deployment_id);
+
+			var environment = document.getElementById('enter_environment').value;
+			window.localStorage.setItem('genesys_environment', environment);
+
+			window.location.reload();
+		}
+
+		function updateMessengerLocale() {
+			var sLangCode = document.getElementById("selectLanguage").value;
+			Genesys("command", "Messenger.configure", { config: { lang: sLangCode } }, function () {
+				console.log("Messenger language updated!");
+			}, function (e) {
+				console.error("Error calling Messenger.configure", e);
+			});
+		}
+
+		var DOMAINS = {
+			'apne1': 'mypurecloud.jp',
+			'apne2': 'apne2.pure.cloud',
+			'apse2': 'mypurecloud.com.au',
+			'aps1': 'aps1.pure.cloud',
+			'cac1': 'cac1.pure.cloud',
+			'euc1': 'mypurecloud.de',
+			'euw1': 'mypurecloud.ie',
+			'euw2': 'euw2.pure.cloud',
+			'use1': 'mypurecloud.com',
+			'usw2': 'usw2.pure.cloud',
+			'fedramp-use2': 'use2.us-gov-pure.cloud',
+			'maximus-use2': 'use2.maximus-pure.cloud',
+		};
+
+		var sGenesysJSDomain = "https://apps." + DOMAINS[window.localStorage.getItem('genesys_environment')];
+
+	</script>
+
+	<script type="text/javascript">
+		(function (g, e, n, es, ys) {
+			g['_genesysJs'] = e; g[e] = g[e] || function () { (g[e].q = g[e].q || []).push(arguments) };
+			g[e].t = 1 * new Date(); g[e].c = es;
+			ys = document.createElement('script'); ys.async = 1; ys.src = n; ys.charset = 'utf-8'; document.head.appendChild(ys);
+		})(window, 'Genesys', sGenesysJSDomain + '/genesys-bootstrap/genesys.min.js', {
+			environment: window.localStorage.getItem('genesys_environment'),
+			deploymentId: window.localStorage.getItem('genesys_deployment_id'),
+			debug: true
+		});
+	</script>
+
+	<script>
+
+		if (Genesys) {
+			const ndAuthLoginBtn = document.getElementById('authLoginBtn');
+			const ndAuthLogoutBtn = document.getElementById('authLogoutBtn');
+			const ndAuthClientId = document.getElementById('authClientId');
+			const ndOktaURL = document.getElementById('oktaURL');
+			const ndAuthScope = document.getElementById('authScope');
+			const ndLoading = document.getElementById('loading');
+			const ndAuthFlow = document.getElementById('oAuthFlow');
+			const ndAuthMaxAge = document.getElementById('maxAge');
+			const ndSignInButton = document.getElementById('signInButton');
+			const ndSignContent = document.getElementById('signin');
+			const bFetching = localStorage.getItem('authFetching'); // eslint-disable-line
+			let sRedirectURL = window.location.href; /**OKTA redirecturi is expected to be the full path in case of the deployed url */
+			let bAuthenticated = false,
+				bAlreadyAuthorized = false,
+				authClient = '',
+				brandAuthCode = '';
+
+			// LocalStorage usage is must for this product
+			// If their exists any previous selections, grab and add them
+			const clientId = window.localStorage.getItem('clientId'); // eslint-disable-line
+			const oktaurl = window.localStorage.getItem('oktaurl'); // eslint-disable-line
+			const authScope = window.localStorage.getItem('authScope'); // eslint-disable-line
+			const AuthFlow = window.localStorage.getItem('authFlow'); // eslint-disable-line
+			let maxAge = window.localStorage.getItem('maxAge'); // eslint-disable-line
+
+			/** OktaAuth generates nonce by default and send it to authorization server which then stores it in session storage. In order to send the same nonce to the authClient get it from the session storage and resolve it in getAuthCode
+			 * When pkce option is true, OKTAAuth generates its own code verifier and code challenge and stores it in session storage. In order to send the same codeVerifier to the authClient get it from the session storage and resolve it in getAuthCode*/
+			let sOktaTransactionStorage = window.sessionStorage.getItem("okta-transaction-storage"), // eslint-disable-line
+				verifier = '',
+				sNonce = ''; // eslint-disable-line
+
+			if (sOktaTransactionStorage) {
+				const oStorage = JSON.parse(sOktaTransactionStorage);
+
+				if (oStorage && Object.keys(oStorage).length) {
+					const { codeVerifier, nonce } = oStorage || {};
+
+					verifier = codeVerifier || '';
+					sNonce = nonce || '';
+				}
+			}
+
+			const QueryString = window.location.search;
+			const urlParams = new URLSearchParams(QueryString);
+
+			if (urlParams.has('code')) {
+				brandAuthCode = urlParams.get('code');
+			} else {
+				const query = window.location.search.substring(1);
+				const code = query.split('code=')[1];
+
+				brandAuthCode = code && code.split('&')[0];
+			}
+
+			if (sRedirectURL && sRedirectURL.indexOf('?code') !== -1) { /**split the redirect url from the authorized okta response and pass it to the getAuthcode command */
+				bAlreadyAuthorized = true;
+				const aPath = sRedirectURL.split('?code');
+
+				sRedirectURL = aPath && aPath.length && aPath[0];
+			}
+
+			if (clientId) ndAuthClientId.value = clientId;
+			if (oktaurl) ndOktaURL.value = oktaurl;
+			if (authScope) ndAuthScope.value = authScope;
+			if (maxAge) ndAuthMaxAge.value = maxAge;
+
+			if (AuthFlow) ndAuthFlow.value = AuthFlow;
+
+			if(oktaurl && sRedirectURL){ /**Initialize the okta auth client with the config options */
+				authClient = new OktaAuth({
+					issuer: `${oktaurl}`,
+					redirectUri: `${sRedirectURL}`,
+					postLogoutRedirectUri: `${sRedirectURL}`
+				});
+			}
+
+			let bPKCE = AuthFlow == "pkce_flow" || false;
+
+			Genesys('subscribe', 'GenesysJS.configurationReceived', function (config) {
+				if (config) {
+					const { deploymentConfig } = config.data || {};
+					const { auth } = deploymentConfig || {};
+					const { enabled: bAuthEnabled } = auth || {};
+					if (bAuthEnabled) {
+						ndSignInButton && ndSignInButton.removeAttribute("disabled");
+						if (!bAuthenticated && !bAlreadyAuthorized && ndSignInButton.classList.contains("collapsed")) {
+							ndSignInButton.classList.remove("collapsed");
+							ndSignContent.classList.remove("collapse");
+							ndSignContent.classList.add("show");
+							ndAuthClientId.focus();
+						}
+					}
+				}
+			});
+
+			function toggleLogin() {
+				if (bAuthenticated) {
+					document.getElementById("okta_sign_in").style.display = 'none';
+					document.getElementById("okta_sign_out").style.display = 'block';
+					ndLoading.style.display = 'none';
+				} else {
+					if (!bFetching) {
+						document.getElementById("okta_sign_in").style.display = 'block';
+					}
+					document.getElementById("okta_sign_out").style.display = 'none';
+				}
+			}
+
+			function showProgress() {
+				document.getElementById("okta_sign_in").style.display = 'none';
+				document.getElementById("okta_sign_out").style.display = 'none';
+				ndLoading.style.display = 'block';
+			}
+
+			function hideProgress() {
+				ndLoading.style.display = 'none';
+			}
+
+			function brandLogin() { // eslint-disable-line
+
+				const sClientId = ndAuthClientId.value;
+				const sOktaurl = ndOktaURL.value;
+				const sAuthScope = ndAuthScope.value;
+
+				const sAuthFlow = ndAuthFlow.value;
+
+				bPKCE = sAuthFlow == "pkce_flow" || false;
+
+				const aScopes = ['openid', 'email', 'profile'];
+
+				maxAge = ndAuthMaxAge.value;
+
+				localStorage.setItem('clientId', sClientId); // eslint-disable-line
+				localStorage.setItem('oktaurl', sOktaurl); // eslint-disable-line
+				localStorage.setItem('authScope', sAuthScope); // eslint-disable-line
+				localStorage.setItem('maxAge', maxAge); // eslint-disable-line
+				localStorage.setItem("authFlow", sAuthFlow); // eslint-disable-line
+
+
+				if (sClientId && sOktaurl) { // eslint-disable-line
+					showProgress();
+					// LocalStorage usage is must for this product
+					localStorage.setItem('authFetching', true); // eslint-disable-line
+					if (sAuthScope === 'offline_access') aScopes.push(sAuthScope);// eslint-disable-line
+
+					const oktaConfig = {// eslint-disable-line
+						redirectUri: `${sRedirectURL}`,
+						clientId: sClientId,
+						issuer: `${sOktaurl}`,
+						scopes: aScopes,
+						pkce: bPKCE ? true : false,
+						responseType: 'code',
+					};
+
+					if (maxAge) {
+						oktaConfig.maxAge = parseInt(maxAge) // eslint-disable-line
+					}
+
+					/**Initialize the okta auth client with the config options */
+
+					if (!authClient) authClient = new OktaAuth(oktaConfig); // eslint-disable-line 
+
+					authClient.signInWithRedirect({
+						originalUri: `${window.location.href}`,
+						...oktaConfig,
+					});
+
+
+				} else {
+					// LocalStorage usage is must for this product
+					localStorage.setItem('authFetching', false);  // eslint-disable-line
+					if (!sClientId) document.getElementById('authClientId').classList.add('is-invalid');
+					if (!sOktaurl) document.getElementById('oktaURL').classList.add('is-invalid');
+				}
+			}
+
+			function clearStorage() {
+				// LocalStorage usage is must for this product
+				localStorage.removeItem('clientId');  // eslint-disable-line
+				localStorage.removeItem('oktaurl'); // eslint-disable-line
+				localStorage.removeItem('authScope'); // eslint-disable-line
+				if (maxAge) localStorage.removeItem('maxAge'); // eslint-disable-line
+
+				if (AuthFlow) localStorage.removeItem('authFlow'); // eslint-disable-line
+
+				localStorage.setItem('authFetching', false);  // eslint-disable-line
+
+				ndAuthClientId.value = '';
+				ndOktaURL.value = '';
+				ndAuthScope.value = 'offline_access';
+				ndAuthMaxAge.value = '';
+				ndAuthFlow.value = "authorization_code_flow";
+			}
+
+			ndAuthLoginBtn.onclick = function () {              // eslint-disable-line
+				localStorage.setItem('clientId', ndAuthClientId.value); // eslint-disable-line
+				localStorage.setItem('oktaurl', ndOktaURL.value); // eslint-disable-line
+				localStorage.setItem('authScope', ndAuthScope.value); // eslint-disable-line
+				localStorage.setItem('maxAge', ndAuthMaxAge.value); // eslint-disable-line
+				localStorage.setItem("authFlow", ndAuthFlow.value); // eslint-disable-line
+
+				brandLogin();
+			};
+			// LocalStorage usage is must for this product
+
+			if (bFetching === 'true') {
+				showProgress();
+			}
+			else {
+				toggleLogin();
+			}
+
+			// OpenId Authentication setup
+
+			// AuthProvider plugin written by the brand
+
+			Genesys('registerPlugin', 'AuthProvider', (AuthProvider) => {
+				// COMMANDS
+
+				// getAuthCode
+				// getTokens
+				// setTokens
+
+				/* Register Commands */
+
+				AuthProvider.registerCommand('getAuthCode', (e) => {
+					const { forceUpdate } = e.data || {};
+					if (forceUpdate) {
+						ndAuthLoginBtn.click(); // simulate the login click.
+						e.resolve();
+					} else {
+						const sData = {
+							authCode: brandAuthCode,
+							redirectUri: `${sRedirectURL}`,
+							nonce: sNonce,
+						};
+
+						if (maxAge) sData.maxAge = parseInt(maxAge);
+						if (bPKCE && verifier) sData.codeVerifier = verifier;
+
+						e.resolve(sData);
+					}
+				});
+
+				AuthProvider.registerCommand('reAuthenticate', (e) => {
+					// Brand can handle this how ever they want.
+					// This command will be called when current refreshToken and/or authCode are no more valid. User needs to re-login here to provide us new authCode and/or refreshToken.
+					ndAuthLoginBtn.click(); // simulate the login click.
+					e.resolve();
+				});
+
+				AuthProvider.subscribe('Auth.ready', () => {
+					bAuthenticated = AuthProvider.data('Auth.authenticated');
+					toggleLogin();
+				});
+
+				AuthProvider.subscribe('Auth.authenticated', () => {
+					bAuthenticated = true;
+					hideProgress();
+					// LocalStorage usage is must for this product
+					localStorage.setItem('authFetching', false);  // eslint-disable-line
+					toggleLogin();
+				});
+
+				AuthProvider.subscribe('Auth.error', (error) => {
+					const { message } = error.data || {};
+
+					hideProgress();
+					// 'message' here is provided by our API and its always expected to be in string. Any security scan results are false postive in this case.
+					console.log("Auth Error", message);
+					// LocalStorage usage is must for this product
+					localStorage.setItem('authFetching', false); // eslint-disable-line
+				});
+
+				AuthProvider.subscribe('Auth.authError', (error) => {
+					hideProgress();
+					// 'message' here is provided by our API and its always expected to be in string. Any security scan results are false postive in this case.
+					console.log("Auth Error", error);
+					// LocalStorage usage is must for this product
+					clearStorage();
+				});
+
+				/* Handlers */
+
+				ndAuthLogoutBtn.onclick = function () {
+					AuthProvider.command('Auth.logout')
+						.finally(() => {
+							bAuthenticated = false;
+							if (authClient) authClient.signOut();
+							toggleLogin();
+							clearStorage();
+						});
+				};
+
+				// Tell CXBus your plugin is ready (mandatory)
+				AuthProvider.ready();
+			});
+		}
+
+	</script>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
+		crossorigin="anonymous"></script>
+
+</html>
