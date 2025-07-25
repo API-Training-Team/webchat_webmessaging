@@ -19,14 +19,15 @@
     <div id="login-message"></div>
 
     <script type="text/javascript">
-        // Configuração do Okta (SUBSTITUA COM SEUS DADOS)
+     
         const oktaConfig = {
-            clientId: "0oanh1tn2aD6SvlNm5d7",
-            issuer: "https://dev-74567406.okta.com/oauth2/default",
-            redirectUri: "https://api-training-team.github.io/webchat_webmessaging/authenticated.html",
-            scopes: ["openid", "profile", "email", "offline_access"], 
-            responseType: "code",
-            pkce: false, // Sem PKCE
+            redirectUri: 'https://trial-2736324.okta.com/oauth2/default',
+            postLogoutRedirectUri:    'https://api-training-team.github.io/webchat_webmessaging/',
+            clientId: '0oatkqs4ij0J17GVy697',
+            issuer: 'https://trial-2736324.okta.com/oauth2/default',
+            scopes: ['openid', 'email', 'profile', 'offline_access'], 
+            pkce: false,
+            responseType: 'code',
             maxAge: 3600
         };
 
@@ -86,57 +87,21 @@
             }
         }
 
-        // Inicializa Genesys Web Messaging com autenticação JWT
-        function initializeGenesysWebMessaging(jwtToken) {
-            console.log("Iniciando Genesys Web Messaging...");
+<script type="text/javascript" charset="utf-8">
+  (function (g, e, n, es, ys) {
+    g['_genesysJs'] = e;
+    g[e] = g[e] || function () {
+      (g[e].q = g[e].q || []).push(arguments)
+    };
+    g[e].t = 1 * new Date();
+    g[e].c = es;
+    ys = document.createElement('script'); ys.async = 1; ys.src = n; ys.charset = 'utf-8'; document.head.appendChild(ys);
+  })(window, 'Genesys', 'https://apps.mypurecloud.ie/genesys-bootstrap/genesys.min.js', {
+    environment: 'prod-euw1',
+    deploymentId: '243dcd97-e195-49bd-b234-bb405c772b66'
+  });
+</script>
 
-            if (!jwtToken) {
-                console.error("JWT não encontrado! O Genesys Messenger não será inicializado.");
-                return;
-            }
-
-            (function (g, e, n, es, ys) {
-                g['_genesysJs'] = e;
-                g[e] = g[e] || function () {
-                    (g[e].q = g[e].q || []).push(arguments);
-                };
-                g[e].t = 1 * new Date();
-                g[e].c = es;
-                ys = document.createElement('script');
-                ys.async = 1;
-                ys.src = n;
-                ys.charset = 'utf-8';
-                ys.onload = function () {
-                    console.log("Genesys Web Messenger carregado com sucesso!");
-                };
-                ys.onerror = function () {
-                    console.error("Erro ao carregar Genesys Web Messenger.");
-                };
-                document.head.appendChild(ys);
-            })(window, 'Genesys', 'https://apps.mypurecloud.ie/genesys-bootstrap/genesys.min.js', {
-                environment: 'prod-euw1',
-                deploymentId: '243dcd97-e195-49bd-b234-bb405c772b66',
-                messenger: {
-                    authentication: {
-                        jwt: jwtToken
-                    }
-                }
-            });
-        }
-
-        // Logout do usuário e redireciona para a página inicial
-        async function signOut() {
-            await authClient.signOut();
-            window.location.href = "https://api-training-team.github.io/webchat_webmessaging/";
-        }
-
-        // Verifica se estamos na página de callback do login e processa a autenticação
-        if (window.location.href.includes("code=")) {
-            handleLoginCallback();
-        } else {
-            checkAuthentication();
-        }
-    </script>
 
 </body>
 
