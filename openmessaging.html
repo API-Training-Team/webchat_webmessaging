@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Open Messaging - Genesys</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #f9f9f9;
+    }
+    h1 {
+      color: #4a4a4a;
+    }
+    #chatBox {
+      width: 400px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 8px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #log {
+      margin-top: 20px;
+      font-size: 14px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Test Open Messaging</h1>
+  <div id="chatBox">
+    <label for="msg">Mensagem:</label>
+    <input type="text" id="msg" placeholder="Digite sua mensagem aqui..." />
+    <button onclick="enviar()">Enviar</button>
+    <div id="log"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
